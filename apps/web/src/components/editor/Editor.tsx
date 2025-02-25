@@ -1,40 +1,39 @@
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import { Button } from "../ui/button"
+import { useMemo, useState, useCallback } from 'react'
+import { createEditor, Descendant } from 'slate'
+import { Slate, Editable, withReact } from 'slate-react'
+import { withHistory } from 'slate-history'
 
-export default function Editor() {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-    ],
-    content: '<p>Hello World!</p>',
-  })
+const initialValue: Descendant[] = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'Start writing here...' }],
+  },
+]
 
-  if (!editor) {
-    return null
-  }
+export function Editor() {
+  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+
+  const renderElement = useCallback(({ attributes, children, element }: any) => {
+    switch (element.type) {
+      case 'paragraph':
+        return <p {...attributes}>{children}</p>
+      default:
+        return <p {...attributes}>{children}</p>
+    }
+  }, [])
 
   return (
-    <div className="border rounded-lg p-4">
-      <div className="flex gap-2 mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive('bold') ? 'bg-slate-200' : ''}
-        >
-          Bold
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive('italic') ? 'bg-slate-200' : ''}
-        >
-          Italic
-        </Button>
+    <div className="max-w-4xl mx-auto p-8">
+      <div className="prose dark:prose-invert prose-zinc max-w-none">
+        <Slate editor={editor} value={value} onChange={setValue}>
+          <Editable
+            className="min-h-[calc(100vh-8rem)] outline-none"
+            renderElement={renderElement}
+            placeholder="Start writing..."
+          />
+        </Slate>
       </div>
-      <EditorContent editor={editor} className="prose max-w-none" />
     </div>
   )
 }

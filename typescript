@@ -1,0 +1,43 @@
+interface User {
+id: string;
+name: string;
+email: string;
+avatar: string;
+workspaces: string[];
+}
+
+interface Workspace {
+id: string;
+name: string;
+members: WorkspaceMember[];
+rootDocument: string;
+}
+
+interface Document {
+id: string;
+title: string;
+content: Block[];
+parent: string | null;
+workspace: string;
+createdAt: Date;
+updatedAt: Date;
+createdBy: string;
+}
+
+interface Block {
+id: string;
+type: BlockType;
+content: any;
+children: Block[];
+}
+
+type BlockType =
+| 'text'
+| 'heading1'
+| 'heading2'
+| 'heading3'
+| 'bulletList'
+| 'numberedList'
+| 'code'
+| 'image'
+| 'table';
